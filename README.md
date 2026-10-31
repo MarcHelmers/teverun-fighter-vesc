@@ -204,8 +204,8 @@ sind deutsch.
    (nur 3A-Antwort) → `0x14`- statt `0x11`-Frames; beim Boot alternierendes Probieren.
 4. **`0x11`-Checksummen-Eigenheit** (XOR über 19 Bytes, gesendet werden 16+Prüfsumme).
 5. **`0x71`-Datenzuordnung Byte→RAM→Anzeige** exakt + Alive-Grenze 600 Ticks.
-6. **Display-`0x35`-Layout verifiziert** (inkl. fehlendem Byte [12], +1-Verschiebung)
-   und Rotationszeit-Kandidatenfeldern.
+6. **Display-`0x35`-Layout verifiziert** (inkl. fehlendem Byte [12], +1-Verschiebung);
+   **Rotationszeit = `[8..9]`** (per Display-Firmware-Analyse verifiziert).
 7. **SOC-Kennlinie** aus ROM extrahiert + Näherungen (21 Punkte: 0,05 %SOC).
 8. **EEPROM-Layout** + Generator (Block 1 byte-identisch zum Werksabbild).
 9. **Komplette BLE-Kommandokarte** (0x01–0x1F) in offener Firmware umgesetzt.

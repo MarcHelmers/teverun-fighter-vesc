@@ -341,7 +341,7 @@ Kurzfassung:
 * **ESC→VCU `0x71` = 13 Byte** (11 Daten + Typmarker + XOR; ISR sammelt 13)
 * **ESC-TX-Eigenheit 0x11:** auf der Leitung `[0..15]+Checksumme[19]`, XOR aber über alle 19 Pufferbytes
 
-**Weiterhin nur am Fahrzeug/Scope klärbar:** Rotationszeit-Feld endgültig fixieren (Kalibrierlauf), LED-Pins/-Anzahl, CAN-BMS-IDs/-Layout, Semantik `0x8A/0x8B/0x8C`.
+**Weiterhin nur am Fahrzeug/Scope klärbar:** LED-Pins/-Anzahl (R5-Hinweis: GPIOB PB3/PB4/PB12, §20.2), CAN-BMS-IDs/-Layout, Stecker-Pinouts. **Inzwischen geklärt:** Rotationsfeld = `[8..9]` (§20.1) und `0x8A/0x8B/0x8C` (in der Neu-Generation durch `A5`-Frames ersetzt, §20.1).
 
 ---
 
