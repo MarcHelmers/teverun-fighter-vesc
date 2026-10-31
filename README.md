@@ -213,9 +213,7 @@ sind deutsch.
     ESC-Emulator inkl. Dual-CAN-Spiegelung) — für diese Plattform unseres
     Wissens die ersten öffentlichen.
 
-**Offen (Werkbank/Fahrzeug):** Rotationsfeld-Kalibrierung, `0x71`-Byte [1] und
-Einheiten der ESC-Datenbytes (Sniffer liegt bereit), BMS-CAN-IDs (Sniffer-FW
-liegt bereit), LED-Ader/Anzahl, Stecker-Pinouts.
+**Offen (Werkbank/Fahrzeug):** `0x71`-Byte [1] und Einheiten der ESC-Datenbytes (Sniffer liegt bereit), BMS-CAN-IDs (Sniffer-FW liegt bereit), LED-Ader/Anzahl (R5-Hinweis: GPIOB PB3/PB4/PB12) und Stecker-Pinouts. **Rotationsfeld: geklärt** (`[8..9]`, REA-verifiziert).
 
 *Alles auf eigene Verantwortung. Kein Hersteller-Firmware-Binary enthalten
 (SHA-256 siehe oben).*
