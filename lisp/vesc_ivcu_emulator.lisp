@@ -115,7 +115,7 @@
   (progn
     (buf-put disp 0 0x35) (buf-put disp 1 0x27) (buf-put disp 2 subtype)
     (buf-put disp 3 0) (buf-put disp 4 CLAMP_SCALE_BIT)
-    (buf-put16be disp 5 0) (buf-put disp 7 0) (buf-put16be disp 8 0) (buf-put disp 10 0)
+    (buf-put16be disp 5 0) (buf-put disp 7 0) (buf-put disp 10 0)
     (buf-put disp 11 gear)
     (buf-put disp 12 0)                                  ; Spiegelflags
     (buf-put disp 13 (clamp (round speed_kmh) 0 255))    ; Speed-Feld
@@ -123,8 +123,8 @@
     (buf-put disp 15 0) (buf-put disp 16 0)              ; 0x35E / 0x35F
     (let ((rot (rot-time)))
       (progn
-        (buf-put16be disp 17 rot) (buf-put disp 19 0)    ; [17..18]=0x2F0, [19]=0x2F2&0x5F
-        (buf-put16be disp 20 rot) (buf-put16be disp 22 rot) (buf-put16be disp 24 rot)))
+        (buf-put16be disp 8 rot)                         ; [8..9]=Rotationszeit (FW-verifiziert!)
+        (buf-put disp 19 0)))                            ; [19]=0x2F2&0x5F
     (buf-put24be disp 26 (/ odo_m 100.0))                ; Odometer 3B BE
     (buf-put disp 29 0x09)                               ; Statusbyte
     (buf-put disp 30 WHEEL_CODE)

@@ -329,6 +329,7 @@ Kurzfassung:
 | **`ivcu_esc_sniffer.py`** | Dekoder für ESC-UART-Mitschnitte (klärt Byte [1], Einheiten [4..9], Skalierung [10]) | **Selbsttest 7/7 PASS** + Hexdump-Smoketest PASS |
 | **`can_sniffer_esp32/`** | Passiver BMS-CAN-Sniffer (ESP32 + SN65HVD230, Listen-Only) | **Kompiliert** (PlatformIO, 0 Warnungen); **am Fahrzeug zu betreiben** |
 | **`UBox_Dual_Adapterplan.md`** | Kabelbaum-/Inbetriebnahmeplan UBox-Dual (Weg 2) | Doku-basiert (Spintend-Manual + Foren) |
+| **`make_armnt_pe.py`** | ARMNT-PE-Wrapper (selbstgetestete Thumb-BL-Stub-Kette) für Ghidra/REA | Selbsttest eingebaut; für Display-/R5-/D5-Dekompilate genutzt (§20) |
 | `callgraph.svg` / `callgraph_reduced.svg` | Architektur-Graph gerendert (Graphviz 16.1) | aus den `.dot`-Dateien erzeugt |
 | `bridge_esp32/` + `Teverun_IO_Bridge_Hardware.md` | ESP32-Bridge: Firmware + Hardware | **Kompiliert** (PlatformIO espressif32 8.0.0 / Arduino 3.3.12, 0 Warnungen; RAM 6,8 % / Flash 22,6 %); **Bench offen** |
 | `vesc_ivcu_emulator.lisp` + `VESC_IVCU_Ersatz_Anleitung.md` | VESC-Ersatz (Regelung/Mapping/Hardware) | Code-basiert; **Bench-Validierung offen** |
@@ -354,7 +355,7 @@ Kurzfassung:
 ### 16.2 Geschwindigkeits-/Rotationszeit-Kette (verifiziert)
 * Formel (VCU und App identisch): `speed_kmh = 287 · wheel / speedRaw`, `wheel = 55 71 t[6] × 0,1` (Zoll-Code), `speedRaw = 55 72 t[15..16]` in **0,1 ms**; `speedRaw ≥ 3000` oder `speed ≤ 0,5` ⇒ 0.
 * Das **Display** rechnet ebenfalls `wheel × 287 / rotation_time`; die eKFV-Anzeige-Kompensation skaliert die gesendete Rotationszeit mit `100/W` (W = realer Raddurchmesser in RAM `0x2000029D`; R5-Patchstellen 0x0801078E/0x08010ABA).
-* ⇒ Unsere Bridge-/Lisp-Formel `rot = WHEEL_CODE·287 / speed_kmh` ist bestätigt; **das Byte-Feld im `0x35`-Frame bleibt per Kalibrierlauf zu fixieren** (Kandidaten [17..18]/[20..21]/[22..23]/[24..25]).
+* ⇒ Unsere Bridge-/Lisp-Formel `rot = WHEEL_CODE·287 / speed_kmh` ist bestätigt; **GELÖST (31.10.2026): das Frame-Feld ist `[8..9]` (u16 BE)** – per Display-Firmware-Analyse code-belegt, siehe §20.1.
 
 ### 16.3 BLE-Kommandokarte (vollständig; in der Bridge-Firmware umgesetzt)
 | Cmd | Zweck | Kern |
@@ -377,7 +378,7 @@ OTA-Fenster `[0x08007000, 0x0801EFFF]`; App-Valid `0x5A5A5A5A` @0x0801F800 (INFO
 * **BMS-CAN:** nur „Smart BMS 2.0"/CAN-Bus-Marketing und Community-Hinweise; **keine IDs/Layouts öffentlich** → Sniffer am Fahrzeug nötig.
 * **LED-Hardware:** Firmware = adressierbare RGB-Kette (Bit-Bang) + BLE-Cmd 0x08; Community zeigt LED-Streifen mit Steckverbindern; **Anzahl/Zonen/Pins offen**.
 * **Stecker-Pinout IVCU (M8):** nur in Bilddiagrammen (eScootNow/Voro) → am Fahrzeug verifizieren.
-* **Rotationszeit-Feld:** endgültig per Kalibrierlauf (§5 im VESC-Dokument).
+* **Rotationszeit-Feld:** ✅ geklärt – `[8..9]` (Display-FW-verifiziert, §20.1).
 
 ---
 
@@ -459,4 +460,69 @@ SHA-256-Verweis im README. Bereit zum `git init && git push` (Stand: ~2,9 MB).
 
 ---
 
-*Alle Angaben: statische Analyse eines vorliegenden Firmware-Images; keine Laufzeitbeobachtung am Fahrzeug. Flashen/Umbauten auf eigenes Risiko. Ergänzung 31.10.2026: vollständiger Dekompilat-Export, kommentierte Gesamtquelle, Werkzeug-/Bridge-/VESC-Paket, Web-Nachtrag §16, Ausbaustufen §17 (Eigen-IVCU-Firmware `ivcu_fw/`, ESC-Emulation), Upload-Ordner §18, weitere Firmware-Stände §19.*
+## 20. REA-Tiefenanalyse 31.10.2026 (Display-, R5- und D5-Firmware)
+
+**Werkzeuge:** neuer `make_armnt_pe.py` (ARMNT-PE-Wrapper mit selbstgetesteter Thumb-BL-Stub-Kette
+zur Funktionsfindung); Ghidra 12.1.4 über REA (`decompile_all` nach
+`firmware_versions/decomp_display`, `decomp_r5`, `decomp_d5`).
+**Zielimages:** `display_app.bin` (+Bootloader), `AWIVCU_APP_R5_4_19.hex`, `AWIVCU_APP_D5_4_14_11.hex`
+(Quelle/Validierung: §19). Display = 562, R5 = 534, D5 = 532 analysierte Funktionen.
+
+### 20.1 Display-Firmware – Protokoll ENDGÜLTIG entschlüsselt
+
+* **Empfänger `FUN_00025fac`:** akzeptiert `35 27 3A/3B`, 39 B, **XOR über [0..37] == [38]** (identisch
+  zum IVCU-Builder); kopiert **[3..37] in einen c-Block** (Kanal A=`3A`/B=`3B`, Stride `0x23`=35);
+  600-Tick-Timeout ⇒ Flag „veraltet“ (keine Anzeige-Aktualisierung). Zusätzlich (Spezialmodus 10)
+  Empfang von `AA 55`-Paaren.
+* **Interpretierer `FUN_00026384` – die Geschwindigkeit:**
+  `rot = [8..9]` (u16 BE) und **`speed = Wheel([30]) × 287 / rot`**; dazu
+  **`rot < 5 ⇒ 0x640`** und **`rot > 2999 ⇒ 0`** – die Community-Regel „≥3000 ⇒ 0“ ist damit
+  **code-belegt**. Die früheren Kandidatenfelder `[17..18]/[20..21]/[22..23]/[24..25]` sind
+  **andere u16-Messwerte** (u. a. zwei Werte, die auf 0xDC gekappt und ×5/8 gerechnet werden ⇒
+  Temperatur-artig).
+* **Weitere Feldnutzung:** [3]/[4] = Flag-Bytes (Licht/Bremse/Zustände – im R5-IVCU mit ESC-Bytes
+  belegt), [11] = Gang (0..5; >5 ⇒ 0), [12] = Spiegelflags, [13] = Speed-Feld (nur bei frischem Link),
+  [14] = SOC, [19] = Flags, [26..28] = Odometer (3 B), [29] = Status (Bit7), [30] = Wheel.
+* **Display→IVCU `0x4C`-Builder `FUN_00027270`:** 19 B; [4] = Gang-/Profilindex, [6] = Flags
+  (Bit2 „frisch“, Bit6 „Timeout“, Bit0 Eco), [10] = Start-/EABS-Nibbles, [11..15] = Gang-Arrays,
+  [16]/[17] = Spannungscode/Pack; XOR@[18] – **deckt die IVCU-Seite (FUN_0800F4FA case 5) exakt**.
+* **Neue Protokoll-Generation (v10):** Zusätzliche Frames **`A5`** (19 B: `A5 13 A5 … 55`+XOR;
+  8 B: `A5 08 01 …`+XOR) ersetzen in dieser Display-FW die alten `8A/8B/8C`; **R5/D5-IVCUs parsen A5
+  nicht** (ISR prüft weiter L/8A/8B/8C) ⇒ gehört zur **10.x-Firmware-Familie** (z. B. `D10_4_6_4`,
+  Forum-Download) – nächster Analyse-Kandidat.
+* Display-FW-Update bestätigt (0x88-Blockpfad, `FUN_0001dfe8(0x88)`). MCU-Hinweis: Vektorbasis 0x0
+  (Boot bei 0, App ab 0x10000), SP 0x20005998; Clock-Dispatch mit 30/40/80/120/150-Stufen (offen).
+
+### 20.2 R5-IVCU (5.4.19)
+
+* **Display-Builder `FUN_08010710`/`FUN_0801096C` vollständig gemappt:** [3..4]=0x2DE-Bytes,
+  [5..6]=u16@`0x2E0`, [7]=`0x2E2`, **[8..9]=u16@`0x2E4` (Rotationszeit!)**, [10]=`0x2E6`,
+  [11]=Gang@`0x299`, [12]=`0x29A&0xFE`, [13]=Speed(0x365−0x28), [14]=SOC@`0x35C`, [15..16]=`0x356/357`,
+  [17..18]=u16@`0x2E8`, [19]=`0x2EA&0x5F`, [20..21]=u16@`0x2EC`, [22..23]=u16@`0x2F0`,
+  [24..25]=u16@`0x2F6`, [26..28]=Odometer/10@`0x2F8`, [29]=`0x2FE`, [30]=**Wheel@`0x29D`**
+  (deckt tr-fw „W@0x29D“!), [31]=Pack@`0x2BF`, [32]=Poles@`0x29C`, [33]=(0x29E−0x50)/5,
+  [34..37]=Gang-Arrays, XOR@[38].
+  ⇒ **R5-Generator ist gegenüber R3 um 2 Byte verschoben** (R5 [3..4]=zwei ESC-Bytes; R3 [3]=Status).
+* **0x16-Clamp code-belegt** (`FUN_0800FED2`, 4A-Builder): `if (Flag 0x2000030C ≠ 0) { [15] |= 0x20;
+  if ([10] > 0x16) [10] = 0x16; }` – das per-Gang-**Limit-Byte des 4A-Frames** wird bei gesetztem
+  eKFV-Flag auf **22** geklemmt (R3.4.13: kein Clamp; dort wirkt `0x2000030D` nur als Bit 0x20).
+* **Blinker-/LED-Pins:** `FUN_0801959C` schreibt **GPIOB-Masken 0x8/0x10/0x1000 ⇒ PB3/PB4/PB12**
+  (Blinkzähler, Toggle alle 25 Ticks) – LED-Pin-Kandidaten für PINOUT.md.
+
+### 20.3 D5-IVCU (5.4.14, eKFV)
+
+* Gleiche ISR (nur `L`/8A/8B/8C), **kein A5-Support**; Clamp-Builder `0x800FDCC` (Clamp @0x800FEEA)
+  und Motor-Cap `0x800EF2A` (`cmp/mov #0x640`) lokalisiert – bestätigt die Patch-Profile aus §19.3.
+
+### 20.4 Konsequenzen
+
+* **Offener Punkt #1 (Rotationsfeld) geschlossen:** `[8..9]`. Bridge, `ivcu_fw` und beide Lisp-Skripte
+  sowie der Codec senden die Zeitspanne jetzt dort (Rebuilds/Tests grün, 31.10.2026).
+* `0x8A/0x8B/0x8C`: in der neuen Generation durch `A5` ersetzt; deren Inhalte sind oben dokumentiert –
+  für die Alt-Generation bräuchte es eine alte Display-FW (nicht öffentlich).
+* Neue Dekompilate: `firmware_versions/decomp_display|decomp_r5|decomp_d5`; PE-Werkzeug
+  `make_armnt_pe.py` (Selbsttest) steht für weitere Images bereit.
+
+---
+
+*Alle Angaben: statische Analyse eines vorliegenden Firmware-Images; keine Laufzeitbeobachtung am Fahrzeug. Flashen/Umbauten auf eigenes Risiko. Ergänzung 31.10.2026: vollständiger Dekompilat-Export, kommentierte Gesamtquelle, Werkzeug-/Bridge-/VESC-Paket, Web-Nachtrag §16, Ausbaustufen §17 (Eigen-IVCU-Firmware `ivcu_fw/`, ESC-Emulation), Upload-Ordner §18, weitere Firmware-Stände §19, REA-Tiefenanalyse §20 (Display/R5/D5).*

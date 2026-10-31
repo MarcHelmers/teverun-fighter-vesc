@@ -46,16 +46,15 @@ static const uint8_t GEAR_CUR_A[5]     = { 15, 20, 25, 30, 55 };
 // Display-Frame: Clamp/Scale-Bit in Byte 4 (R3 = 0 offen; eKFV-aehnlich = 0x02)
 #define CLAMP_SCALE_BIT  0x00
 
-// Rotationszeit (verifiziertes Layout: Kandidatenfelder sind
-//   [17..18]=0x200002F0, [20..21]=0x200002F4, [22..23]=0x200002F8,
-//   [24..25]=0x200002FE; zusaetzlich [10]=0x200002E4 "Rotationsrohwert").
-// Display rechnet Speed = Wheel*287/rot  (rot in 0,1 ms)
-//   => rot = WHEEL_CODE*287/speed_kmh. Bis zur Verifikation alle
-//      konfigurierten Felder beschicken.
-#define ROT_FIELD_17_18  1           // Bytes [17..18]
-#define ROT_FIELD_20_21  1           // Bytes [20..21]
-#define ROT_FIELD_22_23  1           // Bytes [22..23]
-#define ROT_FIELD_24_25  1           // Bytes [24..25]
+// ROTATIONSZEIT: [8..9] (u16 BE) -- VERIFIZIERT per Display-Firmware-Analyse
+// (31.10.2026): Display rechnet speed = wheel([30]) * 287 / rot (rot in 0,1 ms);
+//   rot < 5 => 0x640, rot > 2999 => 0.  => rot = WHEEL_CODE*287/speed_kmh.
+// Die frueheren Kandidatenfelder tragen ANDERE u16-Daten (ESC-Messwerte) und
+// bleiben standardmaessig aus.
+#define ROT_FIELD_17_18  0           // Bytes [17..18] (Alt-Kandidat)
+#define ROT_FIELD_20_21  0           // Bytes [20..21] (Alt-Kandidat)
+#define ROT_FIELD_22_23  0           // Bytes [22..23] (Alt-Kandidat)
+#define ROT_FIELD_24_25  0           // Bytes [24..25] (Alt-Kandidat)
 #define ROT_MAX          0xFFFF
 
 // ---------------------------------------------------------------------------

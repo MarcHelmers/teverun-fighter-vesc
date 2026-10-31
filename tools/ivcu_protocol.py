@@ -83,7 +83,8 @@ Community-Referenz (Laufbursche42/tr-lb-edition, "BLE protocol reference").
     [0]=0x35 [1]=0x27 [2]=Subtyp
     [3]=Status (0x200002DB)         [4]=Flagbyte (Bit1=Clamp/Scale 0x2000030D)
     [5..6]=u16 BE (0x200002DE)      [7]=(0x200002E0)
-    [8..9]=u16 BE (0x200002E2)      [10]=(0x200002E4, Rotationsrohwert)
+    [8..9]=u16 BE (0x200002E4-analog) = ROTATIONSZEIT (Display-FW-verifiziert!)
+                                 [10]=0x200002E6
     [11]=Gang                        [12]=0x200002A3/A2 & 0xFE (Spiegelflags)
     [13]=Speed-Feld (0x2000036D-0x28, 0 unter 0x29)
     [14]=SOC (0x20000364)            [15]=0x2000035E [16]=0x2000035F
@@ -824,7 +825,7 @@ def display_build_35(subtype="3A", status=0, flags=0, val_de=0, val_e0=0,
                      flag_f2=0, val_f4=0, val_f8=0, val_fe=0, odometer=0,
                      status306=0, wheel=100, pack_voltage=60, pole_pairs=30,
                      temp_c=None, temp_byte=None, start_level=0, gear_limit=0,
-                     power_limit=0, rear_current=0):
+                     power_limit=0, rear_current=0, rotation=None):
     """Baut einen VCU->Display-Frame 0x35 (39 Byte, XOR ueber [0..37] @[38]).
 
     Feldlagen = am ROM verifiziert (FUN_080107da '3A' / FUN_08010648 '3B',
@@ -847,7 +848,8 @@ def display_build_35(subtype="3A", status=0, flags=0, val_de=0, val_e0=0,
     buf[4] = _need_byte("flags", flags)
     _put_u16be(buf, 5, _need_u16("val_de", val_de))
     buf[7] = _need_byte("val_e0", val_e0)
-    _put_u16be(buf, 8, _need_u16("val_e2", val_e2))
+    _put_u16be(buf, 8, _need_u16("rotation", rotation)
+               if rotation is not None else _need_u16("val_e2", val_e2))
     buf[10] = _need_byte("val_e4", val_e4)
     buf[11] = _need_byte("gear", gear)
     buf[12] = _need_byte("mirror_flags", mirror_flags)
@@ -902,6 +904,7 @@ def display_parse(frame):
         "val_de": _u16be(frame, 5),
         "val_e0": frame[7],
         "val_e2": _u16be(frame, 8),
+        "rotation": _u16be(frame, 8),             # [8..9] = Rotationszeit (verifiziert)
         "val_e4": frame[10],
         "gear": frame[11],
         "mirror_flags": frame[12],

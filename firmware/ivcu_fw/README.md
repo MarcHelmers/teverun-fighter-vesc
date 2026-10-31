@@ -67,10 +67,9 @@ Original-Image besitzen.
 3. **Display:** 0x35-Frames alle 100 ms + Keep-Alive – Display muss normal
    starten (keine „IVCU communication"-Fehler). Gang im Displaymenü wechseln →
    `vesc_send(0x02)` erscheint am VESC-UART.
-4. **Speed-Kalibrierung:** In `include/ivcu_config.h` sind alle vier
-   Rotations-Kandidatenfelder aktiv. Per Test (z. B. Simulation wie im
-   Bridge-README, oder Schritt 5) das **richtige Feld** identifizieren und die
-   übrigen `CFG_ROT_FIELD_*` auf 0 setzen.
+4. **Speed:** Die Rotationszeit geht in **[8..9]** (per Display-Firmware-Analyse
+   verifiziert – Haupt-Doku §20.1); kein Kalibrierschritt mehr nötig, nur die
+   Anzeige gegen GPS/App plausibilisieren.
 5. **VESC:** Lisp laden (`MODE 0`), UART 115200. Prüfen: `54 01`-Telemetrie
    kommt an (Speed/SOC/Pack/Gang), Heartbeat; bei Timeout > 1 s zeigt das Skript
    Speed 0 an.

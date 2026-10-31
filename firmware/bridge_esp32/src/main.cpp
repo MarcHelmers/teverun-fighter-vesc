@@ -108,8 +108,11 @@ static void sendDisplay35(uint8_t subtype) {
   f[12] = 0x00;                                    // Spiegelflags (0x2A3/A2 & 0xFE)
   f[13] = vesc.speed_kmh;                          // Speed-Feld
   f[14] = vesc.soc;                                // SOC
+  /* Rotationszeit: VERIFIZIERT (Display-FW-Analyse 31.10.2026) = [8..9] (u16 BE).
+     Display rechnet: speed = wheel([30]) * 287 / rot; rot<5 => 0x640, rot>2999 => 0. */
+  f[8] = (uint8_t)(rot >> 8); f[9] = (uint8_t)rot;
   f[15] = 0; f[16] = 0;                            // 0x35E / 0x35F
-  if (ROT_FIELD_17_18) { f[17] = (uint8_t)(rot >> 8); f[18] = (uint8_t)rot; }
+  if (ROT_FIELD_17_18) { f[17] = (uint8_t)(rot >> 8); f[18] = (uint8_t)rot; }  /* Alt-Kandidat, default aus */
   f[19] = 0x00;                                    // 0x2F2 & 0x5F
   if (ROT_FIELD_20_21) { f[20] = (uint8_t)(rot >> 8); f[21] = (uint8_t)rot; }
   if (ROT_FIELD_22_23) { f[22] = (uint8_t)(rot >> 8); f[23] = (uint8_t)rot; }

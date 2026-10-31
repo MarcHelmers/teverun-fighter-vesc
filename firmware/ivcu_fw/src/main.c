@@ -138,6 +138,8 @@ static void display_send35(uint8_t subtype)
     f[12] = 0;
     f[13] = vs.speed_kmh;
     f[14] = vs.soc;
+    /* Rotationszeit: VERIFIZIERT (Display-FW-Analyse 31.10.2026) = [8..9] */
+    f[8] = (uint8_t)(rot >> 8); f[9] = (uint8_t)rot;
     f[15] = 0; f[16] = 0;                         /* 0x35E / 0x35F */
 #if CFG_ROT_FIELD_17_18
     f[17] = (uint8_t)(rot >> 8); f[18] = (uint8_t)rot;

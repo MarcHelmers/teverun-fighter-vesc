@@ -75,6 +75,16 @@ cross-checks). If you work on this platform, these are the highlights:
     *completely untouched* IVCU, incl. **dual-motor support** (CAN mirroring
       to the second controller; `can-send-sid`, packets 1/2).
 
+11. **Display firmware decoded (REA deep-dive, 31.10.2026):** the display computes
+    `speed = wheel([30]) · 287 / rot` with **rot = bytes [8..9]** (u16 BE;
+    `< 5 ⇒ 0x640`, `> 2999 ⇒ 0` — the community "≥3000" rule is now code-proven),
+    maps the full `0x35` frame, builds the `0x4C` command frame field-exactly,
+    and introduces the **new-generation `A5` frames** (which replace `0x8A/8B/8C`
+    and are not parsed by R5/D5 → they belong to the **10.x firmware family**).
+    Also documented: R5 display-builder field map, the eKFV **`0x16`=22 clamp**
+    on the 4A frame's limit byte (flag `0x2000030C`), and the blinker pins
+    **PB3/PB4/PB12** (GPIOB).
+
 Additionally confirmed: MCU is a **GD32F303-class part (Cortex-M4F, FPU)** with
 STM32F1-style peripherals (SWD pads; RDP check non-destructive; app window
 `0x08007000…0x0801EFFF`, flag pages `0x0801F000`/`0x0801F800`, CRC-16 poly
@@ -98,6 +108,7 @@ tools/       ivcu_protocol.py + ivcu_sim.py (codec + frame simulator)
              ivcu_esc_sniffer.py (decode ESC-bus UART captures)
              ivcu_fw_tool.py (HEX validate/patch/CRC) · eeprom_images.py
              soc_kennlinie.c/.png · ghidra_apply_annotations.py · build_callgraph.py
+             make_armnt_pe.py (ARMNT-PE wrapper for Ghidra/REA deep-dives)
 analysis/    decompiled.c (671 functions, 83.1 % of code bytes, commented)
              function_index.csv · strings.txt · callgraph.dot/.svg (+reduced)
 ```
@@ -119,7 +130,9 @@ limits, SOC from the extracted curve) and the community-checked speed law.
 
 ## Open items (help welcome)
 
-* **Rotation field final calibration** on a bench (candidate bytes are all fed).
+* ✅ **Rotation field solved** (31.10.2026): the display reads it from byte `[8..9]`
+  — all senders updated. Next analysis target: the **10.x firmware family**
+  (A5 display protocol, e.g. `D10_4_6_4`).
 * **`0x71` byte [1]** and the **units** of bytes `[4..9]` / scaling of `[10]`
   → use `tools/ivcu_esc_sniffer.py` on a logic-analyzer capture.
 * **BMS CAN IDs/payloads** → `firmware/can_sniffer_esp32/` (listen-only) is ready.

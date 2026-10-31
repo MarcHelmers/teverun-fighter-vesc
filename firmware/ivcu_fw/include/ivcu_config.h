@@ -47,14 +47,14 @@
 /* Clamp/Scale-Bit in Byte [4], Bit1: R3 = offen (0x00); eKFV-aehnlich = 0x02 */
 #define CFG_CLAMP_SCALE_BIT   0x00
 
-/* Rotationszeit-Kandidatenfelder im 0x35-Frame (bis Kalibrierung alle senden):
- *   [17..18]=0x200002F0, [20..21]=0x200002F4, [22..23]=0x200002F8,
- *   [24..25]=0x200002FE.  Display rechnet Speed = Wheel*287/rot (rot 0,1 ms),
- *   community-verifiziert: speedRaw >= 3000 => Anzeige 0. */
-#define CFG_ROT_FIELD_17_18   1
-#define CFG_ROT_FIELD_20_21   1
-#define CFG_ROT_FIELD_22_23   1
-#define CFG_ROT_FIELD_24_25   1
+/* Rotationszeit: [8..9] (u16 BE) -- VERIFIZIERT per Display-Firmware-Analyse:
+ *   Display rechnet speed = wheel([30]) * 287 / rot (rot in 0,1 ms);
+ *   rot < 5 => 0x640, rot > 2999 => 0. => rot = WHEEL_CODE*287/speed_kmh.
+ * Alt-Kandidatenfelder (tragen andere ESC-u16-Daten) bleiben aus. */
+#define CFG_ROT_FIELD_17_18   0
+#define CFG_ROT_FIELD_20_21   0
+#define CFG_ROT_FIELD_22_23   0
+#define CFG_ROT_FIELD_24_25   0
 #define CFG_ROT_MAX           0xFFFFu   /* Stillstands-Marker (>=3000 genuegt) */
 
 /* ---------------------------------------------------------------------------

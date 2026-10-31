@@ -102,7 +102,7 @@
 **Werkbank (Räder frei, Motor aus):**
 1. Display anschließen (Bridge/VESC), Boot: Display muss normal starten (kein „IVCU connection error").
 2. `display-send-35`-Strom prüfen: Geschwindigkeit 0; **Gang im Displaymenü umschalten** → Skript-Log muss Gangwechsel via `0x4C/Cmd1` zeigen.
-3. **Speed-Kalibrierung:** Feld `[17..18]`/`[20..21]`/`[22..23]`/`[24..25]` experimentell mit `Wert = Wheel·287 / Wunsch-km/h` beschicken, beobachten, welches Feld die Anzeige treibt → endgültige Formel in `display-send-35` festlegen (R5-Doku nennt zwei Rotationszeit-Sites; in R3 entsprechen ihnen diese Felder).
+3. **Speed-Feld (seit 31.10.2026 geklärt):** Die Rotationszeit geht in **`[8..9]`** (`Wert = Wheel·287 / Wunsch-km/h`, 0,1-ms-Einheiten); Display-FW-Analyse in Haupt-Doku §20.1. Skripte senden bereits korrekt – nur noch Anzeige gegen GPS/App plausibilisieren.
 4. SOC/Spannung/Temp plausibel anzeigen lassen (Werte über VESC Tool vorgeben/ändern).
 5. App-Test (nur Variante A): Teverun-App verbinden, `55 43` (Version), `55 52` (SOC), `55 71` (Gänge/Limits) prüfen; Umbenennen (Cmd 0x1F) testen.
 6. Motor-Test an der Bank: Gas/Bremse, Slew-Rampe, Temperatur-Abschaltung.

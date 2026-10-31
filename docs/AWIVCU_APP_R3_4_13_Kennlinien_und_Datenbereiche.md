@@ -98,18 +98,18 @@ Rahmen: Befehl `0x35`, Länge `0x27` (39 B), Subtyp `3A` (`FUN_080107DA`) bzw. `
 | [4] | Flagbyte, Bit1 = Clamp/Scale-Latch 0x2000030D |
 | [5..6] | u16 BE (0x200002DE) |
 | [7] | 0x200002E0 |
-| [8..9] | u16 BE (0x200002E2) |
-| [10] | 0x200002E4 (Rotationsrohwert) |
+| **[8..9]** | **ROTATIONSZEIT u16 BE** (R3-Quelle 0x200002E2) – Display-FW-verifiziert (Haupt-Doku §20.1) |
+| [10] | 0x200002E4 (ESC-Rohwert) |
 | [11] | Gang |
 | [12] | Spiegelflags (0x200002A3/A2 & 0xFE) |
 | [13] | **Speed-Feld** (max(0, 0x2000036D−0x28)) |
 | [14] | **SOC** (0x20000364) |
 | [15]/[16] | 0x2000035E / 0x2000035F |
-| [17..18] | u16 BE (0x200002F0) – Rotationszeit-Kandidat |
+| [17..18] | u16 BE (0x200002F0) – ESC-Messwert ( **nicht** Rot!) |
 | [19] | 0x200002F2 & 0x5F |
-| [20..21] | u16 BE (0x200002F4) – Kandidat |
-| [22..23] | u16 BE (0x200002F8) – Kandidat |
-| [24..25] | u16 BE (0x200002FE) – Kandidat |
+| [20..21] | u16 BE (0x200002F4) – Messwert |
+| [22..23] | u16 BE (0x200002F8) – Messwert |
+| [24..25] | u16 BE (0x200002FE) – Messwert |
 | [26..28] | Odometer/10, 3B BE (0x20000300/10) |
 | [29] | Statusbyte (0x20000306) |
 | [30] | Wheel (0x200002A5) |
@@ -124,7 +124,7 @@ Rahmen: Befehl `0x35`, Länge `0x27` (39 B), Subtyp `3A` (`FUN_080107DA`) bzw. `
 
 **Quelle der Messfelder (neu, `FUN_0800F4FA`):** Die Werte `0x2DB..0x2E5` sind die Kopie der ESC-`0x71`-Bytes `[3..11]` — `[3]`→`0x2DB`, `[4]`→`0x2DC`, `[5..6]`→u16 BE @`0x2DE`, `[7]`→`0x2E0`, `[8..9]`→u16 BE @`0x2E2`, `[10]`→`0x2E4` (Rot-Rohwert, 1 Byte), `[11]`→`0x2E5`; die 3B-Antwort spiegelt nach `0x2E6..0x2EF`. **Bit0 von ESC[11] = Dual-Motorfähigkeit** und steuert die `0x11`/`0x14`-Variantenwahl der IVCU-Frames (`FUN_080105A8`).
 
-**Rotationszeit-Formel (community-verifiziert + Analyse):** `Speed = Wheel · 287 / rot` ⇒ `rot = Wheel-Code · 287 / speed_kmh` (Wheel-Code = Zoll×10, rot in 0,1 ms). Bestätigt durch die App-/Community-Doku (tr-lb-edition/tr-fw): dieselbe Kette gilt fürs Telemetriefeld `speedRaw = 55 72 t[15..16]`; `speedRaw ≥ 3000` oder `Speed ≤ 0,5` ⇒ Anzeige 0. Die eKFV-Anzeige-Kompensation skaliert die gesendete Rotationszeit mit `100/W` (W = realer Rad-Code in RAM `0x2000029D`; R5-Patchstellen 0x0801078E/0x08010ABA) — das Display erwartet also genau diese normierte Zeit. Bis zur Verifikation werden im `0x35`-Frame alle Kandidatenfelder ([17..18]/[20..21]/[22..23]/[24..25]) beschickt (Details: §16.2 der Haupt-Doku).
+**Rotationszeit-Formel (community-verifiziert + Analyse):** `Speed = Wheel · 287 / rot` ⇒ `rot = Wheel-Code · 287 / speed_kmh` (Wheel-Code = Zoll×10, rot in 0,1 ms). Bestätigt durch die App-/Community-Doku (tr-lb-edition/tr-fw): dieselbe Kette gilt fürs Telemetriefeld `speedRaw = 55 72 t[15..16]`; `speedRaw ≥ 3000` oder `Speed ≤ 0,5` ⇒ Anzeige 0. Die eKFV-Anzeige-Kompensation skaliert die gesendete Rotationszeit mit `100/W` (W = realer Rad-Code in RAM `0x2000029D`; R5-Patchstellen 0x0801078E/0x08010ABA) — das Display erwartet also genau diese normierte Zeit. **Verifiziert (Display-FW-Analyse, Haupt-Doku §20.1): Das Rotationsfeld ist `[8..9]`**; die früheren Kandidatenfelder tragen andere ESC-u16-Daten.
 
 ---
 
