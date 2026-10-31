@@ -410,6 +410,8 @@ Code MIT) und `.gitignore`, dazu:
 **Bewusst nicht** enthalten: das Original-Firmware-Image (HEX/BIN) – stattdessen
 SHA-256-Verweis im README. Bereit zum `git init && git push` (Stand: ~2,9 MB).
 
+* **Veröffentlicht (31.10.2026):** https://github.com/MarcHelmers/teverun-fighter-vesc (public, Branch `main`)
+
 ---
 
 *Alle Angaben: statische Analyse eines vorliegenden Firmware-Images; keine Laufzeitbeobachtung am Fahrzeug. Flashen/Umbauten auf eigenes Risiko. Ergänzung 31.10.2026: vollständiger Dekompilat-Export, kommentierte Gesamtquelle, Werkzeug-/Bridge-/VESC-Paket, Web-Nachtrag §16, Ausbaustufen §17 (Eigen-IVCU-Firmware `ivcu_fw/`, ESC-Emulation), Upload-Ordner §18.*
