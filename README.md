@@ -127,6 +127,33 @@ limits, SOC from the extracted curve) and the community-checked speed law.
 * **Connector pinouts** (IVCU M8 / motor / hall) — photos + continuity tests welcome.
 * EEPROM bus pin confirmation (PB6/7 vs PB8/9) and CAN pin remap.
 
+## Firmware versions & sources (research update 31.10.2026)
+
+| Source | Contents |
+|---|---|
+| Teverun After-Sale Guide (official) | IVCU **2.2.17 / 3.4.10 / 3.6.10** — 3.6.10 is newer than the analyzed R3.4.13 |
+| Rydology | **3.4.13** (identical to the analyzed image) + 3.4.5 — direct .hex links |
+| **Spooonky's repo** (German RE project) | IVCU **D5.4.10 / D5.4.14 (eKFV!)**, **R5.4.19** (the build patched by the tr-fw project), **ALI D3.4.12** (+bootloader/chipdump) — **display firmware** (`display_app.bin`, `display_bootloader.bin`) — web-patcher sources incl. exact **patch profiles (JSON)** |
+| eScooter-Stammtisch thread 3219 | older eKFV **D10_4_6_4**, **R3_4_10** (+address-analysis Excel) |
+| Official app | 3.6.10 & battery "AWE" firmware are distributed in-app only |
+| **ESC / motor-controller firmware** | **not public**; zero-start unlock requires a dealer update device + cable |
+
+All downloaded IVCU images validate with our tooling (`tools/ivcu_fw_tool.py`,
+CRC OK) — see `docs/AWIVCU_APP_R3_4_13_Doku_FINAL.md` §19 for sizes/hashes/sources
+and first insights from the community patch profiles:
+
+* R5.4.19 **carries the `0x16` (=22) speed clamp** in all four controller-frame
+  builders; **R3.4.13 does not** — version history of the "speed/pull" clamp.
+* eKFV **D5.4.14** clamps the 4A-frame output byte (`[+0xA]`, our Gear-Limit byte)
+  to an artificial value; removal yields the natural ~100 like the ALI box.
+* **PB5** is involved in the turn-signal branch (R5.4.19) — new pin hint for LED work.
+* **Zero-start** is an EEPROM **block 5 @0xB0** setting (→ RAM `0x20000399`), absent
+  from the D5 series — confirms our EEPROM block layout.
+
+**Next steps enabled by this:** decompile-compare **D5.4.14 (eKFV) / R5.4.19** against
+R3.4.13, and **analyze the display firmware** — which can settle the remaining
+display-protocol open items (rotation-time field in `0x35`, meaning of `0x8A/0x8B/0x8C`).
+
 ## Safety, legal, credits
 
 * Work on your own risk; high-voltage battery, brakes and motor safety are on
@@ -135,8 +162,8 @@ limits, SOC from the extracted curve) and the community-checked speed law.
   usual channels and **verify the SHA-256 above** before restoring. All docs/
   code are our own reverse-engineering output for interoperability/repair.
 * Not affiliated with Teverun or Spintend. Credits to the community work of
-  *Laufbursche42* (`tr-fw`, `tr-lb-edition`), the Spintend UBOX manual and all
-  forum contributors.
+  *Laufbursche42* (`tr-fw`, `tr-lb-edition`), **Spooonky** (eKFV reverse-engineering,
+  display firmware & web patcher) and all eScooter-Stammtisch / forum contributors.
 
 ## License
 

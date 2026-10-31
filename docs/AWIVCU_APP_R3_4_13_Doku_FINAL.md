@@ -414,4 +414,49 @@ SHA-256-Verweis im README. Bereit zum `git init && git push` (Stand: ~2,9 MB).
 
 ---
 
-*Alle Angaben: statische Analyse eines vorliegenden Firmware-Images; keine Laufzeitbeobachtung am Fahrzeug. Flashen/Umbauten auf eigenes Risiko. Ergänzung 31.10.2026: vollständiger Dekompilat-Export, kommentierte Gesamtquelle, Werkzeug-/Bridge-/VESC-Paket, Web-Nachtrag §16, Ausbaustufen §17 (Eigen-IVCU-Firmware `ivcu_fw/`, ESC-Emulation), Upload-Ordner §18.*
+---
+
+## 19. Weitere Firmware-Stände (Web-Recherche 31.10.2026)
+
+**Ergebnis: Ja** – es existieren mehrere weitere Stände, inkl. **eKFV- und Display-Firmware**.
+
+### 19.1 Bezugsquellen
+
+| Quelle | Inhalt |
+|---|---|
+| **Teverun After-Sale Guide** (offiziell) | IVCU **2.2.17**, **3.4.10**, **3.6.10** (neuer als unsere 3.4.13!) – Google-Drive-Links |
+| **Rydology** | **3.4.13** (== analysierte Datei) + **3.4.5** als direkte .hex-Links |
+| **Spooonky** (GitHub, deutsches RE-Projekt) | IVCU: **D5_4_10**, **D5_4_14_11** (eKFV), **R5_4_19** (international; Ziel der tr-fw-Patches), **ALI D3_4_12** (+Bootloader/Chipdump) — **Display: `display_app.bin` + `display_bootloader.bin`** (Original & Ali) — plus WebPatcher-Quellen & Patch-Profile (JSON mit exakten Offsets) |
+| **eScooter-Stammtisch** (Thread 3219) | ältere eKFV **D10_4_6_4** + **R3_4_10** (+ Adressierungs-Excel) als Foren-Downloads (Login) |
+| Teverun-App | **3.6.10** und Batterie-„AWE"-Firmware in-App; AWE-Files nicht öffentlich verlinkt |
+| **ESC-/Motorcontroller-Firmware** | **nicht öffentlich**; Zero-Start-Freischaltung nur mit Händler-Updategerät+Kabel |
+
+### 19.2 Validierung der neuen IVCU-Images (`ivcu_fw_tool.py`, alle CRC OK)
+
+| Datei | Version | Größe | Start (SLA) | SHA-256 (Image) |
+|---|---|---|---|---|
+| `AWIVCU_APP_D5_4_14_11.hex` (eKFV) | **5.4.14** | 92.436 B | 0x08007149 | `bd7d3583…e413` |
+| `AWIVCU_APP_D5_4_10_x.hex` (eKFV) | **5.4.10** | 92.448 B | 0x08007161 | `b1b163f6…f03e` |
+| `AWIVCU_APP_R5_4_19.hex` | **5.4.19** | 92.924 B | 0x08007149 | `1049f6f3…0a70` |
+| `AWIVCU_APP_ALI_D3_4_12.hex` (Ali-Box) | Trailer 5.4.14 | 93.568 B | 0x08007149 | `f6db9b18…fb99` |
+| *(Referenz)* `AWIVCU_APP_R3_4_13.hex` | 3.4.13 | 93.627 B | 0x08007161 | `613ee416…1318` |
+
+### 19.3 Sofort verwertbare Erkenntnisse aus den Community-Patchprofilen (Spooonky)
+
+* **Der `0x16`-Clamp (22) lebt in R5.4.19** (`movs r7,#0x16` in allen 4 Controller-Frame-Buildern:
+  0x0801005C / 0x0801020C / 0x080103B4 / 0x080105D4) → **R3.4.13 hatte ihn nicht** (unsere Analyse) ⇒ Versionshistorie des „Speed/Zug"-Clamps.
+* **eKFV D5.4.14** klemmt den Frame-Ausgang `[+0xA]` (= unser 4A-Layout: **Gear-Limit-Byte**) auf einen künstlichen Wert; Entfernen ⇒ natürlicher Wert ≈ 100 wie bei der **ALI-Box**.
+* **ALI-Firmware** ist damit die „unlocked"-Referenz (natürlicher 100er-Output, Stock `cmp #0x640`).
+* **PB5** spielt im Blinker-Zweig eine Rolle (`PB5_RESET` @0x08019610 in R5.4.19) → neuer Pin-Hinweis für LED-/Blinker-Hardware.
+* **Zero-Start** = Setting im **EEPROM-Block 5 @0xB0** (→ RAM `0x20000399`), fehlt der D5-Serie — bestätigt unser EEPROM-Block-Layout (0xB0/6 B).
+* R5-BLE-Hooks: hook 0x0800B87E → Patch @0x0801DB00, `uart_send` 0x08019AFE; App-Ende **0x0801DAFB**.
+
+### 19.4 Nächste Schritte (neu möglich)
+
+* **Dekompilat-Vergleich** D5_4_14_11 (eKFV!) / R5_4_19 ↔ R3.4.13: Clamp-Stellen, Scale-Bit, Display-Interaktion.
+* **Display-Firmware analysieren** (`display_app.bin` 120 KiB, ARM-Cortex-M-Vektortabelle, SP 0x20005998; Bootloader 64 KiB) — **löst die offenen Punkte Rotationsfeld im 0x35-Frame und 0x8A/0x8B/0x8C-Semantik**.
+* Lokale Ablage der neuen Stände: `firmware_versions/` (bewusst **nicht** im GitHub-Repo — Vendor-Binaries werden dort nicht verteilt).
+
+---
+
+*Alle Angaben: statische Analyse eines vorliegenden Firmware-Images; keine Laufzeitbeobachtung am Fahrzeug. Flashen/Umbauten auf eigenes Risiko. Ergänzung 31.10.2026: vollständiger Dekompilat-Export, kommentierte Gesamtquelle, Werkzeug-/Bridge-/VESC-Paket, Web-Nachtrag §16, Ausbaustufen §17 (Eigen-IVCU-Firmware `ivcu_fw/`, ESC-Emulation), Upload-Ordner §18, weitere Firmware-Stände §19.*
