@@ -1,0 +1,42 @@
+// rea decompile_all
+// name: FUN_08019c08
+// address: 0x8019c08
+// body: available
+// range: 0x8019c08-0x8019c5f inclusive
+// non_contiguous: false
+// provider: Ghidra 12.1.4 (ghidra)
+// analysis_profile: 2068bb4c5374392aa3dcb38f17244e2fffe75b2b231c9707e7b2810034d9bb45
+// limitations: The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.; The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.; Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.; Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.; Windows Ghidra P0 accepts native x86, x86-64, ARMNT (Thumb-2) and ARM64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.; The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.; Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.; Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.; External functions and functions without an analyzable body return null; other decompiler failures remain explicit.
+// pseudocode: provider-specific; not original source
+
+
+undefined4 FUN_08019c08(int param_1,uint param_2)
+
+{
+  int iVar1;
+  uint uVar2;
+  undefined4 uVar3;
+  
+  uVar2 = 0;
+  uVar3 = 0;
+  FUN_08009740();
+  FUN_080097cc(0x34);
+  do {
+    if (param_2 <= uVar2) {
+code_r0x08019c50:
+      FUN_080097cc(0x20);
+      FUN_0800974c();
+      return uVar3;
+    }
+    if ((param_1 + uVar2 * 0x400 & 0x7ff) == 0) {
+      iVar1 = FUN_080097d8(param_1 + uVar2 * 0x400);
+      if (iVar1 != 6) {
+        uVar3 = 0;
+        goto code_r0x08019c50;
+      }
+      uVar3 = 1;
+    }
+    uVar2 = uVar2 + 1 & 0xff;
+  } while( true );
+}
+

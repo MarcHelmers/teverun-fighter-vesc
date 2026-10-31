@@ -1,0 +1,94 @@
+// rea decompile_all
+// name: FUN_00019c04
+// address: 0x19c04
+// body: available
+// range: 0x19c04-0x19c2f inclusive
+// range: 0x19c38-0x19c87 inclusive
+// range: 0x19c90-0x19cdf inclusive
+// range: 0x19ce8-0x19d37 inclusive
+// range: 0x19d40-0x19d6b inclusive
+// non_contiguous: true
+// provider: Ghidra 12.1.4 (ghidra)
+// analysis_profile: 2068bb4c5374392aa3dcb38f17244e2fffe75b2b231c9707e7b2810034d9bb45
+// limitations: The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.; The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.; Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.; Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.; Windows Ghidra P0 accepts native x86, x86-64, ARMNT (Thumb-2) and ARM64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.; The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.; Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.; Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.; External functions and functions without an analyzable body return null; other decompiler failures remain explicit.
+// pseudocode: provider-specific; not original source
+
+
+void FUN_00019c04(void)
+
+{
+  if (DAT_20000128 != '\0') {
+    switch(DAT_20000128) {
+    case '\x01':
+      FUN_00019d6c();
+      break;
+    case '\x02':
+      FUN_0001a644();
+      break;
+    default:
+      break;
+    case '\x04':
+      FUN_0001a6bc();
+      break;
+    case '\b':
+      FUN_0001a6fc();
+    }
+    DAT_20000128 = '\0';
+  }
+  if (DAT_200000ec != '\0') {
+    switch(DAT_200000ec) {
+    case '\x01':
+      FUN_0001aad4();
+      break;
+    case '\x02':
+      FUN_0001b264();
+      break;
+    default:
+      break;
+    case '\x04':
+      FUN_0001b368();
+      break;
+    case '\b':
+      FUN_0001b3a8();
+    }
+    DAT_200000ec = '\0';
+  }
+  if (DAT_20000100 != '\0') {
+    switch(DAT_20000100) {
+    case '\x01':
+      FUN_0001b61c();
+      break;
+    case '\x02':
+      FUN_0001bf64();
+      break;
+    default:
+      break;
+    case '\x04':
+      FUN_0001bfb4();
+      break;
+    case '\b':
+      FUN_0001c0d0();
+    }
+    DAT_20000100 = '\0';
+  }
+  if (DAT_20000114 != '\0') {
+    switch(DAT_20000114) {
+    case '\x01':
+      FUN_0001c2c8();
+      break;
+    case '\x02':
+      FUN_0001c550();
+      break;
+    default:
+      break;
+    case '\x04':
+      FUN_0001c648();
+      break;
+    case '\b':
+      FUN_0001c69c();
+    }
+    DAT_20000114 = '\0';
+  }
+  return;
+}
+

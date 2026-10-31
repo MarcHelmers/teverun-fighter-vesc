@@ -111,6 +111,7 @@ tools/       ivcu_protocol.py + ivcu_sim.py (codec + frame simulator)
              make_armnt_pe.py (ARMNT-PE wrapper for Ghidra/REA deep-dives)
 analysis/    decompiled.c (671 functions, 83.1 % of code bytes, commented)
              function_index.csv · strings.txt · callgraph.dot/.svg (+reduced)
+             decomp_r5/ · decomp_d5/ · decomp_display/ (REA/Ghidra exports, §20)
 ```
 
 ## Which conversion path for me?

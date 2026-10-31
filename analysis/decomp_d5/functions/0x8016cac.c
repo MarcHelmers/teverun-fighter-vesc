@@ -1,0 +1,38 @@
+// rea decompile_all
+// name: FUN_08016cac
+// address: 0x8016cac
+// body: available
+// range: 0x8016cac-0x8016ce5 inclusive
+// non_contiguous: false
+// provider: Ghidra 12.1.4 (ghidra)
+// analysis_profile: 2068bb4c5374392aa3dcb38f17244e2fffe75b2b231c9707e7b2810034d9bb45
+// limitations: The session serves operations only after Ghidra reports default auto-analysis complete; incomplete analysis does not expose partial results.; The imported Program and temporary project are ephemeral and deleted on close. Annotation operations edit session database metadata; original executable bytes are never written.; Cancelling an active Ghidra request terminates its ephemeral database and discards session annotations. The selected target remains open; the next provider query imports the original artifact again.; Default-space addresses use lowercase 0x-prefixed hexadecimal; other address spaces use <percent-encoded-space>:0x<hex>.; Windows Ghidra P0 accepts native x86, x86-64, ARMNT (Thumb-2) and ARM64 PE applications and DLLs, and explicitly selected raw 6502 images; managed, hostile, sensitive, and mutable-path targets are unsupported.; The Windows bridge uses authenticated IPv4 loopback because Node path-based IPC does not expose Java AF_UNIX sockets; the endpoint file contains no bearer token.; Windows sessions require the matching packaged Windows x64 native addon, local NTFS targets and runtimes, and Windows 10 or later. Native handles enforce path admission, private DACLs, and Job Object ownership automatically.; Pseudocode is Ghidra decompiler output, not original source and not text-equivalent to Hopper output.; External functions and functions without an analyzable body return null; other decompiler failures remain explicit.
+// pseudocode: provider-specific; not original source
+
+
+bool FUN_08016cac(int param_1,undefined4 *param_2)
+
+{
+  bool bVar1;
+  uint uVar2;
+  undefined4 uVar3;
+  undefined4 uVar4;
+  undefined4 *puVar5;
+  undefined4 uVar6;
+  
+  bVar1 = FUN_08016c96(param_1);
+  if (!bVar1) {
+    puVar5 = (undefined4 *)(param_1 + (uint)*(byte *)(param_1 + 0x140) * 0x10);
+    uVar3 = puVar5[1];
+    uVar4 = puVar5[2];
+    uVar6 = puVar5[3];
+    *param_2 = *puVar5;
+    param_2[1] = uVar3;
+    param_2[2] = uVar4;
+    param_2[3] = uVar6;
+    uVar2 = *(byte *)(param_1 + 0x140) + 1;
+    *(char *)(param_1 + 0x140) = (char)uVar2 + (char)(uVar2 / 0x14) * -0x14;
+  }
+  return bVar1;
+}
+
