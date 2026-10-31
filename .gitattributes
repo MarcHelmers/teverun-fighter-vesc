@@ -1,0 +1,5 @@
+# Repo-weit LF-Zeilenenden (GitHub-freundlich), Binärdateien ausgenommen
+* text=auto eol=lf
+*.png binary
+*.hex binary
+*.bin binary
