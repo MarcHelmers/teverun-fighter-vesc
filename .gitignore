@@ -1,0 +1,11 @@
+# Build artifacts / caches
+build/
+.pio/
+.vscode/
+__pycache__/
+*.pyc
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*~
